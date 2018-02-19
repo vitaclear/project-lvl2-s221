@@ -1,0 +1,42 @@
+{
+  "name": "vita_diff_utils",
+  "version": "0.0.1",
+  "description": "Find differences in configs",
+  "main": "index.js",
+  "bin": {
+    "gendiff": "dist/bin/gendiff.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "babel-node": "babel-node",
+    "build": "NODE_ENV=production babel src --out-dir dist --source-maps inline",
+    "prepublishOnly": "npm run build",
+    "eslint": "eslint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vitaclear/project-lvl2-s221.git"
+  },
+  "author": "Vita Chistyakova",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vitaclear/project-lvl2-s221/issues"
+  },
+  "homepage": "https://github.com/vitaclear/project-lvl2-s221#readme",
+  "devDependencies": {
+    "babel-cli": "*",
+    "babel-core": "*",
+    "babel-preset-env": "*",
+    "babel-preset-stage-0": "*",
+    "babel-eslint": "^8.2.1",
+    "eslint": "^4.16.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.8.0"
+  },
+  "dependencies": {
+    "commander": "^2.14.1"
+  }
+}
