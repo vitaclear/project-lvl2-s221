@@ -35,7 +35,8 @@
     "eslint": "^4.16.0",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.8.0",
-    "jest": "^22.3.0"
+    "jest": "^22.3.0",
+    "travis": "^0.1.1"
   },
   "dependencies": {
     "commander": "^2.14.1"
