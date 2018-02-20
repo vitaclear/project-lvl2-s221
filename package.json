@@ -10,11 +10,11 @@
     "dist"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "babel-node": "babel-node",
     "build": "NODE_ENV=production babel src --out-dir dist --source-maps inline",
     "prepublishOnly": "npm run build",
-    "eslint": "eslint"
+    "eslint": "eslint",
+    "test": "jest --watch"
   },
   "repository": {
     "type": "git",
@@ -30,15 +30,21 @@
     "babel-cli": "*",
     "babel-core": "*",
     "babel-eslint": "^8.2.1",
+    "babel-jest": "^22.4.0",
     "babel-preset-env": "*",
     "babel-preset-stage-0": "*",
     "eslint": "^4.16.0",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.8.0",
-    "jest": "^22.3.0",
+    "eslint-plugin-jest": "^21.12.2",
+    "jest": "^22.4.0",
     "travis": "^0.1.1"
   },
   "dependencies": {
-    "commander": "^2.14.1"
+    "commander": "^2.14.1",
+    "lodash": "^4.17.5"
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }

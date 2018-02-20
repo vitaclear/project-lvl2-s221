@@ -1,5 +1,6 @@
 #! /usr/bin/env node
 import exec from 'commander';
+import processFiles from '..';
 
 exec
   .version('0.0.1')
@@ -7,3 +8,5 @@ exec
   .usage('[options] <firstConfig> <secondConfig>')
   .option('-f, --format [type]', 'output format')
   .parse(process.argv);
+
+console.log(processFiles());
