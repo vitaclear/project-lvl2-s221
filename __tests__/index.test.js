@@ -1,4 +1,5 @@
-import processFiles, { process, makeOutput } from '../src';
+import { readFileSync } from 'fs';
+import genDiff, { findDiff } from '../src';
 
 const obj1 = {
   host: 'hexlet.io',
@@ -14,11 +15,15 @@ const obj2 = {
 
 const result = ['  host: hexlet.io', '+ timeout: 20', '- timeout: 50', '- proxy: 123.234.53.22', '+ verbose: true'];
 
+const before = JSON.parse(readFileSync('__tests__/__fixtures__/before.json'));
+const after = JSON.parse(readFileSync('__tests__/__fixtures__/after.json'));
+const resFile = readFileSync('__tests__/__fixtures__/result', 'utf8');
+
 describe('Generate difference', () => {
   it('logic', () => {
-    expect(process(obj1, obj2)).toEqual(result);
+    expect(findDiff(obj1, obj2)).toEqual(result);
   });
   it('reading files', () => {
-    expect(processFiles()).toEqual(makeOutput(result));
+    expect(genDiff(before, after)).toEqual(resFile);
   });
 });

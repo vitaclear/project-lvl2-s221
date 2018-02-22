@@ -1,6 +1,6 @@
 {
   "name": "vita_diff_utils",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Find differences in configs",
   "main": "index.js",
   "bin": {
@@ -14,7 +14,7 @@
     "build": "NODE_ENV=production babel src --out-dir dist --source-maps inline",
     "prepublishOnly": "npm run build",
     "eslint": "eslint",
-    "test": "jest --watch"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
