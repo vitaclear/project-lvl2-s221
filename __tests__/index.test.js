@@ -1,4 +1,5 @@
 import { readFileSync } from 'fs';
+import { safeLoad } from 'js-yaml';
 import genDiff, { findDiff } from '../src';
 
 const obj1 = {
@@ -18,6 +19,8 @@ const result = ['  host: hexlet.io', '+ timeout: 20', '- timeout: 50', '- proxy:
 const before = JSON.parse(readFileSync('__tests__/__fixtures__/before.json'));
 const after = JSON.parse(readFileSync('__tests__/__fixtures__/after.json'));
 const resFile = readFileSync('__tests__/__fixtures__/result', 'utf8');
+const beforeYml = safeLoad(readFileSync('__tests__/__fixtures__/before.yml'));
+const afterYml = safeLoad(readFileSync('__tests__/__fixtures__/after.yml'));
 
 describe('Generate difference', () => {
   it('logic', () => {
@@ -25,5 +28,8 @@ describe('Generate difference', () => {
   });
   it('reading files', () => {
     expect(genDiff(before, after)).toEqual(resFile);
+  });
+  it('reading yamls', () => {
+    expect(genDiff(beforeYml, afterYml)).toEqual(resFile);
   });
 });
