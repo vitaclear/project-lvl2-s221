@@ -2,6 +2,7 @@
 import exec from 'commander';
 import { readFileSync } from 'fs';
 import { safeLoad } from 'js-yaml';
+import { parse as parseIni } from 'ini';
 import genDiff from '..';
 
 exec
@@ -14,20 +15,27 @@ exec
 
 const lastArg = process.argv[process.argv.length - 1].toLowerCase();
 const beforeLastArg = process.argv[process.argv.length - 2].toLowerCase();
-const extentionBefore = beforeLastArg.indexOf('.yml') !== -1 ? 'yaml' : 'json';
-const extentionAfter = lastArg.indexOf('.yml') !== -1 ? 'yaml' : 'json';
 
-const chooseParser = (extention, file) => {
-  switch (extention) {
+const extOfFile = (filePath) => {
+  if (filePath.indexOf('.yml') !== -1) { return { type: 'yaml', file: filePath }; }
+  if (filePath.indexOf('.json') !== -1) { return { type: 'json', file: filePath }; }
+  if (filePath.indexOf('.ini') !== -1) { return { type: 'ini', file: filePath }; }
+  return { type: 'unknown', file: filePath };
+};
+
+const chooseParser = (obj) => {
+  switch (obj.type) {
     case 'json':
-      return JSON.parse(readFileSync(file));
+      return JSON.parse(readFileSync(obj.file));
     case 'yaml':
-      return safeLoad(readFileSync(file));
+      return safeLoad(readFileSync(obj.file));
+    case 'ini':
+      return parseIni(readFileSync(obj.file, 'utf-8'));
     default:
-      return readFileSync(file);
+      return readFileSync(obj.file);
   }
 };
 
-const before = chooseParser(extentionBefore, beforeLastArg);
-const after = chooseParser(extentionAfter, lastArg);
+const before = chooseParser(extOfFile(beforeLastArg));
+const after = chooseParser(extOfFile(lastArg));
 console.log(genDiff(before, after));

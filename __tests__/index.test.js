@@ -1,5 +1,6 @@
 import { readFileSync } from 'fs';
 import { safeLoad } from 'js-yaml';
+import { parse as parseIni } from 'ini';
 import genDiff, { findDiff } from '../src';
 
 const obj1 = {
@@ -21,6 +22,8 @@ const after = JSON.parse(readFileSync('__tests__/__fixtures__/after.json'));
 const resFile = readFileSync('__tests__/__fixtures__/result', 'utf8');
 const beforeYml = safeLoad(readFileSync('__tests__/__fixtures__/before.yml'));
 const afterYml = safeLoad(readFileSync('__tests__/__fixtures__/after.yml'));
+const beforeIni = parseIni(readFileSync('__tests__/__fixtures__/before.ini', 'utf-8'));
+const afterIni = parseIni(readFileSync('__tests__/__fixtures__/after.ini', 'utf-8'));
 
 describe('Generate difference', () => {
   it('logic', () => {
@@ -31,5 +34,8 @@ describe('Generate difference', () => {
   });
   it('reading yamls', () => {
     expect(genDiff(beforeYml, afterYml)).toEqual(resFile);
+  });
+  it('reading inis', () => {
+    expect(genDiff(beforeIni, afterIni)).toEqual(resFile);
   });
 });
