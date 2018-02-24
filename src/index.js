@@ -2,58 +2,77 @@ import { readFileSync } from 'fs';
 import { safeLoad } from 'js-yaml';
 import { parse as parseIni } from 'ini';
 import _ from 'lodash';
+import { extname } from 'path';
 
-const getType = (filePath) => {
-  if (filePath.indexOf('.yml') !== -1) { return 'yaml'; }
-  if (filePath.indexOf('.json') !== -1) { return 'json'; }
-  if (filePath.indexOf('.ini') !== -1) { return 'ini'; }
-  return 'unknown';
+const makeParser = {
+  '.yml': file => safeLoad(file),
+  '.json': file => JSON.parse(file),
+  '.ini': file => parseIni(file),
 };
 
-const makeData = (filePath) => {
-  if (getType(filePath) === 'yaml') {
-    return {
-      data: readFileSync(filePath),
-      parse: safeLoad(readFileSync(filePath)),
-    };
+const makeNode = ([children = [], key, beforeValue, afterValue]) => ({
+  children, key, beforeValue, afterValue,
+});
+
+const makeUnchangedAst = (data) => {
+  if (!(data instanceof Object)) {
+    return data;
   }
-  if (getType(filePath) === 'json') {
-    return {
-      data: readFileSync(filePath),
-      parse: JSON.parse(readFileSync(filePath)),
-    };
-  }
-  if (getType(filePath) === 'ini') {
-    return {
-      data: readFileSync(filePath, 'utf-8'),
-      parse: parseIni(readFileSync(filePath, 'utf-8')),
-    };
-  }
-  return { parse: readFileSync(filePath) };
+  return Object.keys(data).map((el) => {
+    if (data[el] instanceof Object) {
+      return makeNode([makeUnchangedAst(data[el]), el]);
+    }
+    return makeNode([[], el, data[el], data[el]]);
+  });
 };
 
-const findDiff = (data1, data2) => {
+const makeAST = (data1, data2) => {
   const keysFromData1 = Object.keys(data1);
   const keysFromData2 = Object.keys(data2);
   const unionKeys = _.union(keysFromData1, keysFromData2);
-  const result = unionKeys.map((el) => {
-    if (!_.has(data1, el)) {
-      return `+ ${el}: ${data2[el]}`;
+  return unionKeys.map((el) => {
+    if (data1[el] instanceof Object && data2[el] instanceof Object) {
+      return makeNode([makeAST(data1[el], data2[el]), el]);
     }
-    if (!_.has(data2, el)) {
-      return `- ${el}: ${data1[el]}`;
-    }
-    if (data1[el] === data2[el]) {
-      return `  ${el}: ${data1[el]}`;
-    }
-    return [`+ ${el}: ${data2[el]}`, `- ${el}: ${data1[el]}`];
+    return makeNode([[], el, makeUnchangedAst(data1[el]), makeUnchangedAst(data2[el])]);
   });
-  return _.flatten(result);
 };
 
-const makeOutput = array => `{\n  ${array.join('\n  ')}\n}`;
+const render = (ast, lvl = 0) => {
+  const indent = '  ';
+  const result = ast.map((el) => {
+    if (el.children.length > 0) {
+      return `${indent.repeat(lvl + 1)}${el.key}: ${render(el.children, lvl + 1)}`;
+    }
+    if (!(el.beforeValue)) {
+      if (el.afterValue instanceof Object) {
+        return `${indent.repeat(lvl)}+ ${el.key}: ${render(el.afterValue, lvl + 1)}`;
+      }
+      return `${indent.repeat(lvl)}+ ${el.key}: ${el.afterValue}`;
+    }
+    if (!el.afterValue) {
+      if (el.beforeValue instanceof Object) {
+        return `${indent.repeat(lvl)}- ${el.key}: ${render(el.beforeValue, lvl + 1)}`;
+      }
+      return `${indent.repeat(lvl)}- ${el.key}: ${el.beforeValue}`;
+    }
+    if (el.beforeValue === el.afterValue) {
+      return `${indent.repeat(lvl + 1)}${el.key}: ${el.beforeValue}`;
+    }
+    if (el.afterValue instanceof Object) {
+      return [`${indent.repeat(lvl)}+ ${el.key}: ${render(el.afterValue, lvl + 1)}`, `${indent.repeat(lvl)}- ${el.key}: ${el.beforeValue}`];
+    }
+    if (el.beforeValue instanceof Object) {
+      return [`${indent.repeat(lvl)}+ ${el.key}: ${el.afterValue}`, `${indent.repeat(lvl)}- ${el.key}: ${render(el.beforeValue, lvl + 1)}`];
+    }
+    return [`${indent.repeat(lvl)}+ ${el.key}: ${el.afterValue}`, `${indent.repeat(lvl)}- ${el.key}: ${el.beforeValue}`];
+  });
+  return `{\n${indent.repeat(lvl + 1)}${_.flatten(result).join(`\n${indent.repeat(lvl + 1)}`)}\n${indent.repeat(2 * lvl)}}`;
+};
 
-const genDiff = (fstConfig, sndConfig) =>
-  makeOutput(findDiff(makeData(fstConfig).parse, makeData(sndConfig).parse));
+const genDiff = (fstConfig, sndConfig) => {
+  const parsedFile = config => makeParser[extname(config)](readFileSync(config, 'utf-8'));
+  return render(makeAST(parsedFile(fstConfig), parsedFile(sndConfig)));
+};
 
 export default genDiff;
