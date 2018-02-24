@@ -8,6 +8,8 @@ run-ini:
 	npm run babel-node -- src/bin/gendiff.js __tests__/__fixtures__/before.ini __tests__/__fixtures__/after.ini
 run-json-deep:
 	npm run babel-node -- src/bin/gendiff.js __tests__/__fixtures__/beforeDeep.json __tests__/__fixtures__/afterDeep.json
+run-output-plain:
+	npm run babel-node -- src/bin/gendiff.js --format plain __tests__/__fixtures__/beforeDeep.json __tests__/__fixtures__/afterDeep.json
 run-help:
 	npm run babel-node -- src/bin/gendiff.js -h
 publish:
