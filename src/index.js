@@ -4,10 +4,10 @@ import { parse as parseIni } from 'ini';
 import _ from 'lodash';
 import { extname } from 'path';
 
-const makeParser = {
-  '.yml': file => safeLoad(file),
-  '.json': file => JSON.parse(file),
-  '.ini': file => parseIni(file),
+const parsers = {
+  '.yml': safeLoad,
+  '.json': JSON.parse,
+  '.ini': parseIni,
 };
 
 const makeNode = ([children = [], key, beforeValue, afterValue]) => ({
@@ -71,8 +71,12 @@ const render = (ast, lvl = 0) => {
 };
 
 const genDiff = (fstConfig, sndConfig) => {
-  const parsedFile = config => makeParser[extname(config)](readFileSync(config, 'utf-8'));
-  return render(makeAST(parsedFile(fstConfig), parsedFile(sndConfig)));
+  const readFstConfig = readFileSync(fstConfig, 'utf-8');
+  const readSndConfig = readFileSync(sndConfig, 'utf-8');
+  const parsedFstConfig = parsers[extname(fstConfig)](readFstConfig);
+  const parsedSndConfig = parsers[extname(sndConfig)](readSndConfig);
+  const ast = makeAST(parsedFstConfig, parsedSndConfig);
+  return render(ast);
 };
 
 export default genDiff;
