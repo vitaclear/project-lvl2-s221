@@ -11,16 +11,20 @@ const resFileName = '__tests__/__fixtures__/result';
 
 const beforeFileDeepJson = '__tests__/__fixtures__/beforeDeep.json';
 const afterFileDeepJson = '__tests__/__fixtures__/afterDeep.json';
+const beforeFileDeepYml = '__tests__/__fixtures__/beforeDeep.yml';
+const afterFileDeepYml = '__tests__/__fixtures__/afterDeep.yml';
+const beforeFileDeepIni = '__tests__/__fixtures__/beforeDeep.ini';
+const afterFileDeepIni = '__tests__/__fixtures__/afterDeep.ini';
 const resFileDeepName = '__tests__/__fixtures__/resultDeep';
 
 describe('Generate difference', () => {
   it('reading json', () => {
     expect(genDiff(beforeFileJson, afterFileJson)).toEqual(readFileSync(resFileName, 'utf8'));
   });
-  it('reading yamls', () => {
+  it('reading yaml', () => {
     expect(genDiff(beforeFileYml, afterFileYml)).toEqual(readFileSync(resFileName, 'utf8'));
   });
-  it('reading inis', () => {
+  it('reading ini', () => {
     expect(genDiff(beforeFileIni, afterFileIni)).toEqual(readFileSync(resFileName, 'utf8'));
   });
   it('reading different', () => {
@@ -28,5 +32,11 @@ describe('Generate difference', () => {
   });
   it('reading deep json', () => {
     expect(genDiff(beforeFileDeepJson, afterFileDeepJson)).toEqual(readFileSync(resFileDeepName, 'utf8'));
+  });
+  it('reading deep yaml', () => {
+    expect(genDiff(beforeFileDeepYml, afterFileDeepYml)).toEqual(readFileSync(resFileDeepName, 'utf8'));
+  });
+  it('reading deep ini', () => {
+    expect(genDiff(beforeFileDeepIni, afterFileDeepIni)).toEqual(readFileSync(resFileDeepName, 'utf8'));
   });
 });
