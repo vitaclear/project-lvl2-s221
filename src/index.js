@@ -11,21 +11,9 @@ const parsers = {
   '.ini': parseIni,
 };
 
-const makeNode = ([type, children = [], key, beforeValue, afterValue]) => ({
-  type, children, key, beforeValue, afterValue,
+const makeNode = (type, key, children, beforeValue, afterValue) => ({
+  type, key, children, beforeValue, afterValue,
 });
-
-const makeSingleDataAst = (data) => {
-  if (!(data instanceof Object)) {
-    return data;
-  }
-  return Object.keys(data).map((el) => {
-    if (data[el] instanceof Object) {
-      return makeNode(['hasChildren', makeSingleDataAst(data[el]), el]);
-    }
-    return makeNode(['unchanged', [], el, data[el]]);
-  });
-};
 
 const makeAST = (data1, data2) => {
   const keysFromData1 = Object.keys(data1);
@@ -33,18 +21,18 @@ const makeAST = (data1, data2) => {
   const unionKeys = _.union(keysFromData1, keysFromData2);
   return unionKeys.map((el) => {
     if (data1[el] instanceof Object && data2[el] instanceof Object) {
-      return makeNode(['hasChildren', makeAST(data1[el], data2[el]), el]);
+      return makeNode('nested', el, makeAST(data1[el], data2[el]));
     }
     if (!data2[el]) {
-      return makeNode(['removed', [], el, makeSingleDataAst(data1[el])]);
+      return makeNode('removed', el, [], data1[el]);
     }
     if (!data1[el]) {
-      return makeNode(['added', [], el, [], makeSingleDataAst(data2[el])]);
+      return makeNode('added', el, [], {}, data2[el]);
     }
     if (data1[el] === data2[el]) {
-      return makeNode(['unchanged', [], el, data1[el]]);
+      return makeNode('unchanged', el, [], data1[el]);
     }
-    return makeNode(['updated', [], el, makeSingleDataAst(data1[el]), makeSingleDataAst(data2[el])]);
+    return makeNode('updated', el, [], data1[el], data2[el]);
   });
 };
 
