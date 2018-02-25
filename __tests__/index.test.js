@@ -17,8 +17,6 @@ const beforeFileDeepIni = '__tests__/__fixtures__/beforeDeep.ini';
 const afterFileDeepIni = '__tests__/__fixtures__/afterDeep.ini';
 const resFileDeepName = '__tests__/__fixtures__/resultDeep';
 
-const resultJSON = '__tests__/__fixtures__/resultJSON';
-
 describe('Generate difference', () => {
   it('reading json', () => {
     expect(genDiff(beforeFileJson, afterFileJson)).toEqual(readFileSync(resFileName, 'utf8'));
@@ -40,8 +38,5 @@ describe('Generate difference', () => {
   });
   it('reading deep ini', () => {
     expect(genDiff(beforeFileDeepIni, afterFileDeepIni)).toEqual(readFileSync(resFileDeepName, 'utf8'));
-  });
-  it('JSON result', () => {
-    expect(genDiff(beforeFileDeepYml, afterFileDeepIni, 'json')).toEqual(readFileSync(resultJSON, 'utf8'));
   });
 });
