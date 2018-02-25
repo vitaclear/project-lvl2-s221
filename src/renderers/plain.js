@@ -1,13 +1,15 @@
 const render = (ast, lvl = '') => {
+  const stringifyValue = (value) => {
+    const resultString = value instanceof Object ? 'complex value' : `value '${value}'`;
+    return resultString;
+  };
+
   const result = ast.map((el) => {
-    if (el.type === 'hasChildren') {
+    if (el.type === 'nested') {
       return `${render(el.children, `${lvl}${el.key}.`)}`;
     }
     if (el.type === 'added') {
-      if (el.afterValue instanceof Object) {
-        return `Property '${lvl}${el.key}' was added with complex value`;
-      }
-      return `Property '${lvl}${el.key}' was added with value: ${el.afterValue}`;
+      return `Property '${lvl}${el.key}' was added with ${stringifyValue(el.afterValue)}`;
     }
     if (el.type === 'removed') {
       return `Property '${lvl}${el.key}' was removed`;
@@ -15,13 +17,7 @@ const render = (ast, lvl = '') => {
     if (el.type === 'unchanged') {
       return `Property '${lvl}${el.key}' was not changed`;
     }
-    if (el.afterValue instanceof Object) {
-      return `Property '${lvl}${el.key}' was updated from '${el.beforeValue}' to complex value`;
-    }
-    if (el.beforeValue instanceof Object) {
-      return `Property '${lvl}${el.key}' was updated from complex value to '${el.afterValue}'`;
-    }
-    return `Property '${lvl}${el.key}' was updated from '${el.beforeValue}' to '${el.afterValue}'`;
+    return `Property '${lvl}${el.key}' was updated from ${stringifyValue(el.beforeValue)} to ${stringifyValue(el.afterValue)}`;
   });
   return `${result.join('\n')}\n`;
 };
