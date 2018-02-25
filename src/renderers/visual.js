@@ -17,19 +17,13 @@ const render = (ast, lvl = 0) => {
   };
 
   const result = ast.map((el) => {
-    if (el.type === 'nested') {
-      return `${indent}${el.key}: ${render(el.children, lvl + 2)}`;
+    switch (el.type) {
+      case 'nested': return `${indent}${el.key}: ${render(el.children, lvl + 2)}`;
+      case 'added': return `+ ${el.key}: ${stringifyValue(el.afterValue, lvl + 2)}`;
+      case 'removed': return `- ${el.key}: ${stringifyValue(el.beforeValue, lvl + 2)}`;
+      case 'unchanged': return `${indent}${el.key}: ${stringifyValue(el.beforeValue, lvl + 2)}`;
+      default: return [`+ ${el.key}: ${stringifyValue(el.afterValue, lvl + 2)}`, `- ${el.key}: ${stringifyValue(el.beforeValue, lvl + 2)}`];
     }
-    if (el.type === 'added') {
-      return `+ ${el.key}: ${stringifyValue(el.afterValue, lvl + 2)}`;
-    }
-    if (el.type === 'removed') {
-      return `- ${el.key}: ${stringifyValue(el.beforeValue, lvl + 2)}`;
-    }
-    if (el.type === 'unchanged') {
-      return `${indent}${el.key}: ${stringifyValue(el.beforeValue, lvl + 2)}`;
-    }
-    return [`+ ${el.key}: ${stringifyValue(el.afterValue, lvl + 2)}`, `- ${el.key}: ${stringifyValue(el.beforeValue, lvl + 2)}`];
   });
   return `{\n${lvlIndent}${_.flatten(result).join(`\n${lvlIndent}`)}\n${closeIndent}}`;
 };
